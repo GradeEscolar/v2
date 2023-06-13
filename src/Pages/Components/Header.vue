@@ -9,7 +9,7 @@
         <div id="title">
             {{ title }}
         </div>
-        <div id="login" v-if="login" @click="goToPage('Login')">
+        <div id="login" v-if="login" @click="doLogin()">
             <i class="pi pi-sign-in"></i>
             <span>Entrar</span>
         </div>
@@ -21,12 +21,14 @@
 </template>
 
 <script lang="ts">
+import LoginService from '@/Services/LoginService';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: "HeaderComponent",
 
     data(): {
+        loginService: LoginService, 
         back: boolean,
         backTo: string,
         icon: string,
@@ -35,6 +37,7 @@ export default defineComponent({
         sair: boolean
     } {
         return {
+            loginService: new LoginService(),
             back: false,
             backTo: '',
             icon: '',
@@ -55,8 +58,19 @@ export default defineComponent({
         goToPage(page: string) {
             this.$emit('goToPage', page);
         },
+        async doLogin() {
+            const dbOk = await this.loginService.config();
+            if(!dbOk) {
+                return;
+            }
+
+            const existeUsuario = await this.loginService.existeUsuario();
+            const page = existeUsuario ? 'Login' : 'Cadastro';
+            this.goToPage(page);
+        },
         doSair() {
-            localStorage.removeItem('access_token');
+            localStorage.removeItem('id_usuario');
+            localStorage.removeItem('nome_usuario');
             this.goToPage('Home');
         },
         definirHeader() {
@@ -73,12 +87,12 @@ export default defineComponent({
                 this.back = true;
                 this.backTo = 'Home';
                 this.icon = 'pi pi-sign-in';
-                this.title = 'Entrar';
+                this.title = 'Login';
                 this.login = false;
                 this.sair = false;
             } else if (page == 'Cadastro') {
                 this.back = true;
-                this.backTo = 'Login';
+                this.backTo = 'Home';
                 this.icon = 'pi pi-id-card';
                 this.title = 'Cadastro';
                 this.login = false;

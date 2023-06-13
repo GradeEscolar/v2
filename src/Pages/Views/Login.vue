@@ -1,41 +1,21 @@
 <template>
-    <section class="form">
-        <form @submit.prevent="signIn()">
-            <div class="field">
-                <label for="email">E-Mail</label>
-                <input type="email" id="email" v-model="usuario.email" 
-                    autocomplete="email" />
-            </div>
-
-            <div class="field">
-                <label for="email">Senha</label>
-                <input type="password" id="senha" v-model="usuario.senha" 
-                    autocomplete="current-password" />
-            </div>
-
-            <div class="button">
-                <button type="submit" :disabled="!formValido">Entrar</button>
-                <mark class="error" v-if="result">{{ result }}</mark>
-            </div>
-
-        </form>
+    <section class="table">
+        <table>
+            <caption>Selecione um usuário para acessar a Grade Escolar.</caption>
+            <tbody>
+                <tr class="hover" v-for="usuario in usuarios" @click="selecionar(usuario)">
+                    <td>{{ usuario.nome }}</td>
+                </tr>
+            </tbody>
+        </table>
     </section>
 
     <p>
-        se ainda não possui cadastro...<br />
-    <div @click="goToPage('Cadastro')">
-        <i class="pi pi-id-card"></i>
-        cadastre-se aqui.
-    </div>
-
-    </p>
-
-    <p>
-        se não quer se cadastrar...<br />
-    <div @click="acessoLocal()">
-        <i class="pi pi-arrow-circle-down"></i>
-        acesso local.
-    </div>
+        se deseja criar um novo usuário...<br />
+        <div @click="goToPage('Cadastro')">
+            <i class="pi pi-id-card"></i>
+            cadastre-se aqui.
+        </div>
     </p>
 </template>
 
@@ -49,30 +29,11 @@ export default defineComponent({
 
     data(): {
         service: LoginService,
-        result: string | undefined,
-        usuario: Usuario,
-        emailPattern: RegExp,
-        senhaPattern: RegExp
+        usuarios: Usuario[] | undefined
     } {
         return {
-            service: new LoginService(this.axios),
-            result: undefined,
-            usuario: new Usuario(),
-            emailPattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
-            senhaPattern: /.{4,}/
-        }
-    },
-
-    computed: {
-        formValido() {
-            if (!this.usuario.email || !this.usuario.senha) {
-                return false;
-            }
-
-            let emailValido = this.emailPattern.test(this.usuario.email);
-            let senhaValida = this.senhaPattern.test(this.usuario.senha);
-
-            return emailValido && senhaValida;
+            service: new LoginService(),
+            usuarios: undefined
         }
     },
 
@@ -83,27 +44,42 @@ export default defineComponent({
             this.$emit('goToPage', page);
         },
 
-        async signIn() {
+        async selecionar(usuario: Usuario) {
             try {
-                this.result = undefined;
-                let access_token = await this.service.login(this.usuario);
-                this.usuario = new Usuario();
-                localStorage.setItem('access_token', access_token);
+                this.service.selecionar(usuario);
                 this.goToPage('Menu');
             }
             catch (error: any) {
-                this.result = error ?? 'Houve uma falha no servidor.';
+                this.goToPage('Home');
             }
         },
 
-        acessoLocal() {
-            localStorage.setItem('access_token', 'local_access');
-            this.goToPage('Menu');
+        async obterUsuarios() {   
+            try {
+                this.usuarios = await this.service.obterUsuarios();
+            } catch (error) {
+                this.goToPage('Home');
+            }
         }
-    }
+    },
+
+    async mounted() {
+        if(!(await this.service.config())){
+            this.goToPage('Home');
+            return;
+        }
+
+        await this.obterUsuarios();
+    },
+
 })
 </script>
 <style scoped>
+
+caption {
+    margin: 40px 0 40px 0;
+}
+
 p {
     margin-top: 50px;
     text-align: center;

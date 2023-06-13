@@ -49,6 +49,11 @@
 
   <footer>
     <p>
+      <span v-if="usuario.nome">
+        Olá, {{ usuario.nome }}!
+      </span>
+    </p>
+    <p>
       Grade Escolar 2023 - v 1.1
     </p>
   </footer>
@@ -66,6 +71,8 @@ import AnotacoesView from './Pages/Views/Anotacoes.vue';
 import DisciplinaConfigView from './Pages/Views/DisciplinaConfig.vue';
 import GradeConfigView from './Pages/Views/GradeConfig.vue';
 import AulaConfigView from './Pages/Views/AulaConfig.vue';
+import Usuario from './Models/Usuario';
+import Auth from './api/Auth';
 
 export default defineComponent({
   name: 'App',
@@ -86,10 +93,13 @@ export default defineComponent({
   data(): {
     page: string | undefined,
     hideBackButton: boolean,
+    usuario: Usuario,
+
   } {
     return {
       page: undefined,
-      hideBackButton: false
+      hideBackButton: false,
+      usuario: Auth.obterUsuario()
     }
   },
 
@@ -156,6 +166,7 @@ export default defineComponent({
   watch: {
     page(newPage: string) {
       localStorage.setItem('page', newPage);
+      this.usuario = Auth.obterUsuario();
     },
     hideBackButton(newValue: boolean) {
       localStorage.setItem('hide_back_button', newValue ? 's' : 'n');
@@ -172,7 +183,7 @@ export default defineComponent({
 
 :root {
   --header-height: 60px;
-  --footer-height: 15px;
+  --footer-height: 20px;
   --header-footer-height: 75px;
   --disciplina-form-height: 106px;
   --header-icon-box-border-color: rgb(40, 50, 55);
@@ -201,6 +212,7 @@ export default defineComponent({
   --evento-background-color: rgb(255, 225, 225);
   --evento-border-color: rgb(155, 100, 100);
   --evento-color: rgb(55, 0, 0);
+  --disabled-text-color: rgb(40, 50, 55);
 
 }
 
@@ -294,10 +306,18 @@ footer {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 15px;
+  height: 20px;
   z-index: 1;
   background-color: rgb(250, 250, 250);
   box-shadow: 0 0 2px 2px white;
+}
+
+footer p:first-child {
+  flex-grow: 1;
+  padding: 2px 0 2px 10px;
+  color: rgb(40, 50, 55);
+  font-size: 9pt;
+  font-style: italic;
 }
 
 footer p {

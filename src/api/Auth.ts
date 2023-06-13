@@ -1,30 +1,32 @@
+import Usuario from "@/Models/Usuario";
+
 export default class Auth {
 
-  
+  // Remover
   public static get localAccess() : boolean {
     const access_token = localStorage.getItem('access_token');
     return access_token == 'local_access'; 
   }
   
   public static get autenticado(): boolean {
-    const access_token = localStorage.getItem('access_token');
-    return access_token == 'local_access' 
-      ? true
-      : access_token != null && !this.tokenExpirado(access_token);
+    const usuario = Auth.obterUsuario();
+    return usuario.id != undefined && usuario.nome != undefined;
   }
 
-  private static tokenExpirado(access_token: string): boolean {
-    const payloadBase64 = access_token.split('.')[1];
-    const payload = JSON.parse(atob(payloadBase64));
-
-    if (payload?.exp) {
-      const expirationDate = new Date(payload.exp * 1000);
-      const currentDate = new Date();
-      return expirationDate < currentDate;
+  public static obterUsuario(): Usuario {
+    const usuario = new Usuario();
+    const id_usuario = localStorage.getItem('id_usuario');
+    const nome_usuario = localStorage.getItem('nome_usuario');
+    
+    if(id_usuario != null && nome_usuario != null) {
+      usuario.id = parseInt(id_usuario);
+      usuario.nome = nome_usuario;
     }
 
-    return false;
+    return usuario;
   }
+
+  
 
   
 }

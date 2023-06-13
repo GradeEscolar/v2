@@ -1,18 +1,33 @@
-import { AxiosStatic } from "axios";
 import LoginRepository from "@/Repositories/LoginRepository";
+import ServiceBase from "@/DataAccess/ServiceBase";
 import Usuario from "@/Models/Usuario";
 
-export default class LoginService {
-
-    private repository: LoginRepository;
-
-    constructor(axios: AxiosStatic) {
-        this.repository = new LoginRepository(axios);
-        this.repository.config();
+export default class LoginService extends ServiceBase<LoginRepository> {
+    
+    config(): Promise<boolean> {
+        return this.baseConfig(() => new LoginRepository());
     }
 
-    async login(usuario: Usuario): Promise<string> {
-        const result = await this.repository.login(usuario);
-        return result.access_token;
+    async existeUsuario(): Promise<boolean> {
+        const qtd = await this.repository.count();
+        return qtd > 0;
+    }
+
+    async cadastrar(nomeUsuario: string): Promise<void> {
+        const existeUsuario = await this.repository.existeUsuario(nomeUsuario);
+        if(existeUsuario)
+            throw new Error("O nome informado já existe!");
+
+        const usuario = await this.repository.criarUsuario(nomeUsuario);
+        this.selecionar(usuario);
+    }
+
+    selecionar(usuario: Usuario) {
+        localStorage.setItem('id_usuario', usuario.id!.toString());
+        localStorage.setItem('nome_usuario', usuario.nome!);
+    }
+
+    async obterUsuarios(): Promise<Usuario[]> {
+        return this.repository.getAll();
     }
 }

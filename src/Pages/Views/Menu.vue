@@ -1,6 +1,9 @@
 <template>
+    
     <section>
+
         <div class="menu">
+
             <span class="lnk" @click="goToPage('Aula')">
                 <i class="pi pi-file-edit"></i>
                 <span>
@@ -51,6 +54,7 @@
 </template>
 
 <script lang="ts">
+import Usuario from '@/Models/Usuario';
 import Auth from '@/api/Auth';
 import { defineComponent } from 'vue';
 
@@ -58,8 +62,10 @@ export default defineComponent({
     name: 'MenuView',
 
     data(): {
+        usuario: Usuario
     } {
         return {
+            usuario: Auth.obterUsuario()
         };
     },
 
@@ -81,6 +87,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
 section {
     display: flex;
     flex-direction: column;
