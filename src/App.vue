@@ -144,7 +144,7 @@ export default defineComponent({
       localStorage.setItem('hide_back_button', 'n');
     }
 
-    window.addEventListener('beforeunload', this.handleBeforeUnload);
+    // window.addEventListener('beforeunload', this.handleBeforeUnload);
 
   },
 
