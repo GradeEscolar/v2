@@ -8,10 +8,10 @@ export default abstract class ServiceBase<TRepository extends IRepositoryBase<IM
         return this._repository!;
     }
 
-    private _tabela: string | undefined;
-    protected get tabela(): string {
-        return this._tabela!;
-    }
+    // private _tabela: string | undefined;
+    // protected get tabela(): string {
+    //     return this._tabela!;
+    // }
 
     abstract config(): Promise<boolean>;
 
