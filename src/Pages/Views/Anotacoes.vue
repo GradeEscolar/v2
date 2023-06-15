@@ -116,7 +116,7 @@ export default defineComponent({
             return;
         }
 
-        await this.disciplinaService.config(this.axios);
+        await this.disciplinaService.config();
         let exibirTitulos = localStorage.getItem('exibir_titulos');
         if (exibirTitulos) {
             this.exibirTitulos = exibirTitulos == 's';

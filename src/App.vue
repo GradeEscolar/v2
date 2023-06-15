@@ -99,7 +99,7 @@ export default defineComponent({
     return {
       page: undefined,
       hideBackButton: false,
-      usuario: Auth.obterUsuario()
+      usuario: Auth.usuario
     }
   },
 
@@ -166,7 +166,7 @@ export default defineComponent({
   watch: {
     page(newPage: string) {
       localStorage.setItem('page', newPage);
-      this.usuario = Auth.obterUsuario();
+      this.usuario = Auth.usuario;
     },
     hideBackButton(newValue: boolean) {
       localStorage.setItem('hide_back_button', newValue ? 's' : 'n');

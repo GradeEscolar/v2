@@ -1,12 +1,13 @@
-import { AxiosStatic } from "axios";
 import Disciplina from "@/Models/Disciplina";
-import IDisciplinaRepository, { DisciplinaRepositoryFactory } from "@/Repositories/DisciplinaRepository";
-import BaseService from "./BaseService";
+import ServiceBase from "@/DataAccess/ServiceBase";
+import DisciplinaRepository from "@/Repositories/DisciplinaRepository";
+import Auth from "@/api/Auth";
 
-export default class DisciplinaService extends BaseService<IDisciplinaRepository> {
+export default class DisciplinaService extends ServiceBase<DisciplinaRepository> {
 
-    async config(axios: AxiosStatic): Promise<boolean> {
-        return this.baseConfig(axios, DisciplinaRepositoryFactory.CreateRepository);
+
+    config(): Promise<boolean> {
+        return this.baseConfig(() => new DisciplinaRepository());
     }
 
     sort(disciplinas: Disciplina[]): Disciplina[] {
@@ -27,11 +28,12 @@ export default class DisciplinaService extends BaseService<IDisciplinaRepository
     }
 
     criar(disciplina: Disciplina) {
+        disciplina.id_usuario = Auth.usuario.id;
         return this.repository.criar(disciplina);
     }
 
     obter() {
-        return this.repository.obter();
+        return this.repository.obter(Auth.usuario.id ?? 0);
     }
 
     atualizar(disciplina: Disciplina) {

@@ -131,8 +131,8 @@ export default defineComponent({
             this.goToPage('Home');
             return;
         }
-        await this.gradeService.config(this.axios);
-        await this.disciplinaService.config(this.axios);
+        await this.gradeService.config();
+        await this.disciplinaService.config();
         await this.obterDadosIniciais();
         await this.obterDados();
     },

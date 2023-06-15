@@ -176,8 +176,8 @@ export default defineComponent({
             this.goToPage('Home');
             return;
         }
-        await this.gradeService.config(this.axios);
-        await this.disciplinaService.config(this.axios);
+        await this.gradeService.config();
+        await this.disciplinaService.config();
         await this.anotacaoService.config(this.axios);
         this.$emit('hideBackButton', false);
         await this.obterDadosIniciais();

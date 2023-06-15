@@ -7,6 +7,6 @@ export default interface IRepositoryBase<T extends IModel> {
     getAll(): Promise<T[]>;
     post(model: T): Promise<T[]>;
     add(model: T): Promise<void>;
-    patch(model: T): Promise<void>;
+    put(model: T): Promise<void>;
     delete(model: T): Promise<void>;
 }

@@ -62,10 +62,8 @@ export default defineComponent({
     name: 'MenuView',
 
     data(): {
-        usuario: Usuario
     } {
         return {
-            usuario: Auth.obterUsuario()
         };
     },
 

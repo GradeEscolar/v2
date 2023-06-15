@@ -92,7 +92,7 @@ export default abstract class RepositoryBase<T extends IModel> extends DataConte
         });
     }
 
-    patch(model: T): Promise<void> {
+    put(model: T): Promise<void> {
         const transaction = this.db.transaction(this.table, "readwrite");
         const objectStore = transaction.objectStore(this.table);
         const request = objectStore.put(this.parseModel(model, false));

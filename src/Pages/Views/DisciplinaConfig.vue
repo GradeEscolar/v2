@@ -4,15 +4,15 @@
 
             <div class="field">
                 <label for="disciplina">Disciplina</label>
-                <input type="text" id="disciplina" v-model="disciplina.disciplina" autofocus ref="disciplinaInput" />
+                <input type="text" id="disciplina" v-model="disciplina.disciplina" autofocus ref="disciplinaInput" @keypress="clearResult()" @change="clearResult()" />
             </div>
 
             <div class="button">
                 <span v-if="!disciplinaSelecionada">
-                    <button type="submit" id="add" :disabled="!formValido">Incluir</button>
+                    <button type="submit" id="add">Incluir</button>
                 </span>
                 <span v-else>
-                    <button type="submit" id="upd" :disabled="!formValido">Salvar</button>
+                    <button type="submit" id="upd">Salvar</button>
                     <button type="button" id="del" @click="del()">Excluir</button>
                     <button type="reset" id="abt">Cancelar</button>
                 </span>
@@ -58,16 +58,6 @@ export default defineComponent({
         }
     },
 
-    computed: {
-        formValido() {
-            if (!this.disciplina.disciplina) {
-                return false;
-            }
-
-            return true;
-        }
-    },
-
     emits: ['goToPage'],
 
     methods: {
@@ -92,6 +82,11 @@ export default defineComponent({
             input.focus();
         },
         async submit() {
+
+            if(!this.disciplina.disciplina || this.disciplina.disciplina.trim() == '') {
+                this.result = 'Informe o nome da disciplina.';
+                return;
+            }
 
             if (this.disciplinas?.find(d => d.disciplina?.toLowerCase() == this.disciplina.disciplina?.toLowerCase()) != undefined) {
                 this.result = 'A disciplina informada já existe.';
@@ -131,11 +126,15 @@ export default defineComponent({
         },
         disciplinaAtiva(disciplina: Disciplina): boolean {
             return this.disciplinaSelecionada?.id == disciplina.id;
+        },
+        clearResult() {
+            if(this.result)
+                this.result = undefined;
         }
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.service.config(this.axios))){
+        if (!Auth.autenticado || !(await this.service.config())){
             this.goToPage('Home');
             return;
         }
