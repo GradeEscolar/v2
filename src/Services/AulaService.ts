@@ -1,13 +1,11 @@
-import { AxiosStatic } from "axios";
-import BaseService from "./BaseService";
-import IAulaRepository, { AulaRepositoryFactory } from "@/Repositories/AulaRepository";
 import Aula from "@/Models/Aula";
+import ServiceBase from "@/DataAccess/ServiceBase";
+import AulaRepository from "@/Repositories/AulaRepository";
 
-export default class AulaService extends BaseService<IAulaRepository> {
-   
+export default class AulaService extends ServiceBase<AulaRepository> {
 
-    async config(axios: AxiosStatic): Promise<boolean> {
-        return this.baseConfig(axios, AulaRepositoryFactory.CreateRepository);
+    config(): Promise<boolean> {
+        return this.baseConfig(() => new AulaRepository());
     }
 
     obter(id_grade: number, dia: number): Promise<Aula[]> {

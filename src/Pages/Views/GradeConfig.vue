@@ -32,7 +32,7 @@
 import Grade from '@/Models/Grade';
 import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import GradeService from '@/Services/GradeService';
 
 export default defineComponent({
@@ -90,7 +90,7 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.service.config())){
+        if (!AuthService.autenticado || !(await this.service.config())){
             this.goToPage('Home');
             return;
         }

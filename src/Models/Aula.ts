@@ -25,7 +25,7 @@ export default class Aula implements IModel {
             if (!novaAula) {
                 novaAula = {
                     id: undefined,
-                    id_grade: grade.id!,
+                    id_grade: grade.id,
                     aula: aula,
                     dia: dia,
                     id_disciplina: undefined

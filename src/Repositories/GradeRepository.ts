@@ -1,7 +1,7 @@
 import Grade from "@/Models/Grade";
 import RepositoryBase from "@/DataAccess/RepositoryBase";
 import AppConfig from "@/AppConfig";
-import Auth from "@/api/Auth";
+import AuthService from "@/Services/AuthService";
 
 export default class GradeRepository extends RepositoryBase<Grade> {
 
@@ -10,7 +10,7 @@ export default class GradeRepository extends RepositoryBase<Grade> {
     }
 
     obter(): Promise<Grade[]> {
-        return this.findOnly('usuario', Auth.usuario.id ?? 0);
+        return this.findOnly('usuario', AuthService.usuario.id ?? 0);
     }
 
     atualizar(grade: Grade): Promise<void> {

@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import Anotacao from '@/Models/Anotacao';
 import Dia from '@/Models/Dia';
 import { defineComponent } from 'vue';
@@ -111,7 +111,7 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.anotacaoService.config(this.axios))) {
+        if (!AuthService.autenticado || !(await this.anotacaoService.config())) {
             this.goToPage('Home');
             return;
         }

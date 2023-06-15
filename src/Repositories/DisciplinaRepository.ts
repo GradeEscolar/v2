@@ -1,4 +1,3 @@
-import { AxiosStatic } from "axios";
 import Disciplina from "@/Models/Disciplina";
 import RepositoryBase from "@/DataAccess/RepositoryBase";
 import AppConfig from "@/AppConfig";

@@ -1,12 +1,6 @@
 import Usuario from "@/Models/Usuario";
 
-export default class Auth {
-
-  // Remover
-  public static get localAccess(): boolean {
-    const access_token = localStorage.getItem('access_token');
-    return access_token == 'local_access';
-  }
+export default class AuthService {
 
   public static get usuario(): Usuario {
     const usuario = new Usuario();
@@ -22,7 +16,7 @@ export default class Auth {
   }
 
   public static get autenticado(): boolean {
-    const usuario = Auth.usuario;
+    const usuario = AuthService.usuario;
     return usuario.id != undefined && usuario.nome != undefined;
   }
 

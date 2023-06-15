@@ -157,7 +157,7 @@ export default defineComponent({
     },
 
     async mounted() {
-        await this.service.config(this.axios);
+        await this.service.config();
         this.definirDataCompleta(this.anotacao);
         this.definirConteudo(this.anotacao);
     },

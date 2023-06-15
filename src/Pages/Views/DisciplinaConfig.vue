@@ -35,8 +35,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import Disciplina from '@/Models/Disciplina'
-import DefaultResponse from '@/api/DefaultResponse';
-import Auth from '@/api/Auth';
+import AuthService from '@/Services/AuthService';
 import DisciplinaService from '@/Services/DisciplinaService';
 
 export default defineComponent({
@@ -115,8 +114,7 @@ export default defineComponent({
                 await this.service.excluir(this.disciplina);
                 await this.obter();
             } catch (error: any) {
-                let response = error.response.data as DefaultResponse;
-                this.result = response.message;
+                this.result = error.message;
             }
         },
         selecionar(disciplina: Disciplina) {
@@ -134,7 +132,7 @@ export default defineComponent({
     },
 
     async mounted() {
-        if (!Auth.autenticado || !(await this.service.config())){
+        if (!AuthService.autenticado || !(await this.service.config())){
             this.goToPage('Home');
             return;
         }

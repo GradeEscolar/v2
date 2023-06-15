@@ -1,10 +1,10 @@
 import IModel from "@/Models/IModel";
 import IRepositoryBase from "./IRepositoryBase";
 
-export default abstract class ServiceBase<TIRepository extends IRepositoryBase<IModel>> {
+export default abstract class ServiceBase<TRepository extends IRepositoryBase<IModel>> {
 
-    private _repository: TIRepository | undefined;
-    protected get repository(): TIRepository {
+    private _repository: TRepository | undefined;
+    protected get repository(): TRepository {
         return this._repository!;
     }
 
@@ -15,7 +15,7 @@ export default abstract class ServiceBase<TIRepository extends IRepositoryBase<I
 
     abstract config(): Promise<boolean>;
 
-    protected async baseConfig(createRepository: () => TIRepository): Promise<boolean> {
+    protected async baseConfig(createRepository: () => TRepository): Promise<boolean> {
         try {
             this._repository = createRepository();
             await this._repository.config();
@@ -25,7 +25,7 @@ export default abstract class ServiceBase<TIRepository extends IRepositoryBase<I
         }
     }
 
-    protected parseModel<T extends IModel>(model: T, removerId: boolean){
+    protected parseModel<T extends IModel>(model: T, removerId: boolean) {
         return JSON.parse(JSON.stringify(model, (key, value) => removerId && key == 'id' ? undefined : value));
     }
 }

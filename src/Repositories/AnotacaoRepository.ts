@@ -1,60 +1,11 @@
-import { AxiosStatic } from "axios";
-import Auth from "@/api/Auth";
-import DbRepository from "@/DataAccess/Repository/DbRepository";
-import ApiRepository from "@/DataAccess/Repository/ApiRepository";
-import DataAccessConfig from "@/DataAccess/DataAccessConfig";
 import Anotacao from "@/Models/Anotacao";
+import RepositoryBase from "@/DataAccess/RepositoryBase";
+import AppConfig from "@/AppConfig";
 
-export default interface IAnotacaoRepository {
-    config(): Promise<void> | void;
-    get acessoLocal(): boolean;
-
-    obter(filtro: Anotacao): Promise<Anotacao[]>;
-    salvar(anotacao: Anotacao): Promise<Anotacao>;
-}
-
-export class AnotacaoRepositoryFactory {
-    static async CreateRepository(axios: AxiosStatic): Promise<IAnotacaoRepository> {
-        let repository: IAnotacaoRepository;
-        if (Auth.localAccess) {
-            repository = new AnotacaoDbRepository();
-            await repository.config();
-        } else {
-            repository = new AnotacaoApiRepository(axios);
-            repository.config();
-        }
-
-        return repository;
-    }
-}
-
-export class AnotacaoApiRepository extends ApiRepository<Anotacao> implements IAnotacaoRepository {
-
-    constructor(axios: AxiosStatic) {
-        super(axios, DataAccessConfig.anotacaoUrl);
-    }
-
-    obter(filtro: Anotacao): Promise<Anotacao[]> {
-        return this.post(filtro);
-    }
-
-    salvar(anotacao: Anotacao): Promise<Anotacao> {
-        return new Promise<Anotacao>(async (ok, err) => {
-            try {
-                let result = await this.axios.put<Anotacao>(this.url, anotacao);
-                ok(result.data);
-            } catch (error: any) {
-                console.log(error);
-                err(error?.request?.data?.message);
-            }
-        });
-    }
-}
-
-export class AnotacaoDbRepository extends DbRepository<Anotacao> implements IAnotacaoRepository {
+export default class AnotacaoRepository extends RepositoryBase<Anotacao> {
 
     constructor() {
-        super(DataAccessConfig.anotacaoTable);
+        super(AppConfig.anotacaoTable);
     }
 
     obter(filtro: Anotacao): Promise<Anotacao[]> {

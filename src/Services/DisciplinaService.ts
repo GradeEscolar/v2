@@ -1,7 +1,7 @@
 import Disciplina from "@/Models/Disciplina";
 import ServiceBase from "@/DataAccess/ServiceBase";
 import DisciplinaRepository from "@/Repositories/DisciplinaRepository";
-import Auth from "@/api/Auth";
+import AuthService from "@/Services/AuthService";
 
 export default class DisciplinaService extends ServiceBase<DisciplinaRepository> {
 
@@ -28,12 +28,12 @@ export default class DisciplinaService extends ServiceBase<DisciplinaRepository>
     }
 
     criar(disciplina: Disciplina) {
-        disciplina.id_usuario = Auth.usuario.id;
+        disciplina.id_usuario = AuthService.usuario.id;
         return this.repository.criar(disciplina);
     }
 
     obter() {
-        return this.repository.obter(Auth.usuario.id ?? 0);
+        return this.repository.obter(AuthService.usuario.id ?? 0);
     }
 
     atualizar(disciplina: Disciplina) {

@@ -1,14 +1,13 @@
-import { AxiosStatic } from "axios";
-import BaseService from "./BaseService";
-import IAnotacaoRepository, { AnotacaoRepositoryFactory } from "@/Repositories/AnotacaoRepository";
 import Aula from "@/Models/Aula";
 import Anotacao from "@/Models/Anotacao";
 import Disciplina from "@/Models/Disciplina";
+import AnotacaoRepository from "@/Repositories/AnotacaoRepository";
+import ServiceBase from "@/DataAccess/ServiceBase";
 
-export default class AnotacaoService extends BaseService<IAnotacaoRepository> {
+export default class AnotacaoService extends ServiceBase<AnotacaoRepository> {
 
-    async config(axios: AxiosStatic): Promise<boolean> {
-        return this.baseConfig(axios, AnotacaoRepositoryFactory.CreateRepository);
+    config(): Promise<boolean> {
+        return this.baseConfig(() => new AnotacaoRepository());
     }
 
     async obterAnotacao(aula: Aula, data: string): Promise<Anotacao> {

@@ -24,7 +24,7 @@
       </div>
 
       <div v-if="page == 'Aula'">
-        <AulaView @go-to-page="goToPage" @hide-back-button="definirHideBackButton"/>
+        <AulaView @go-to-page="goToPage" @hide-back-button="definirHideBackButton" />
       </div>
 
       <div v-if="page == 'Anotacoes'">
@@ -40,7 +40,7 @@
       </div>
 
       <div v-if="page == 'AulaConfig'">
-        <AulaConfigView />
+        <AulaConfigView @go-to-page="goToPage" />
       </div>
 
     </section>
@@ -54,7 +54,7 @@
       </span>
     </p>
     <p>
-      Grade Escolar 2023 - v 1.1
+      Grade Escolar 2023 - v 2.0
     </p>
   </footer>
 </template>
@@ -72,7 +72,7 @@ import DisciplinaConfigView from './Pages/Views/DisciplinaConfig.vue';
 import GradeConfigView from './Pages/Views/GradeConfig.vue';
 import AulaConfigView from './Pages/Views/AulaConfig.vue';
 import Usuario from './Models/Usuario';
-import Auth from './api/Auth';
+import AuthService from './Services/AuthService';
 
 export default defineComponent({
   name: 'App',
@@ -99,7 +99,7 @@ export default defineComponent({
     return {
       page: undefined,
       hideBackButton: false,
-      usuario: Auth.usuario
+      usuario: AuthService.usuario
     }
   },
 
@@ -107,13 +107,24 @@ export default defineComponent({
     goToPage(page: string) {
       this.page = page;
     },
-    definirHideBackButton(hideBackButton: boolean){
+    definirHideBackButton(hideBackButton: boolean) {
       this.hideBackButton = hideBackButton;
     },
     sair() {
       localStorage.removeItem('access_token');
       this.goToPage('Home');
-    }
+    },
+
+    handleBeforeUnload(event: BeforeUnloadEvent) {
+      event.preventDefault();
+      event.returnValue = ''; // Alguns navegadores exigem que essa propriedade seja definida
+
+      // Aqui você pode exibir uma mensagem personalizada para o usuário
+      // alert('Deseja realmente sair desta página?');
+
+      // Você também pode redirecionar o usuário para outra página neste ponto
+      // window.location.href = '/outra-pagina';
+    },
   },
 
   mounted() {
@@ -127,46 +138,20 @@ export default defineComponent({
     }
 
     let hideBackButton = localStorage.getItem('hide_back_button');
-    if(hideBackButton){
-      this.hideBackButton = hideBackButton == 's' ? true : false;  
+    if (hideBackButton) {
+      this.hideBackButton = hideBackButton == 's' ? true : false;
     } else {
       localStorage.setItem('hide_back_button', 'n');
     }
-        
-    this.axios.interceptors.request.use(
-      config => {
-        let access_token = localStorage.getItem('access_token');
-        if (access_token)
-          config.headers.Authorization = `Bearer ${access_token}`;
 
-        return config;
-      },
-      error => {
-        Promise.reject(error);
-      } 
-    )
+    window.addEventListener('beforeunload', this.handleBeforeUnload);
 
-    this.axios.interceptors.response.use(
-      value => value,
-      error => {
-        if(!error.response){
-          this.goToPage('Login');
-          return Promise.reject((error?.message ?? "Api Inativa!") + ' 😩');
-        } else if (error.response?.status == 422 || error.response?.status == 401) {
-          localStorage.removeItem('access_token');
-          this.goToPage('Login');
-          return Promise.reject("Acesso não permitido!" + ' 🚫');
-        }
-
-        return Promise.reject(error?.response?.data?.message);
-      }
-    )
   },
 
   watch: {
     page(newPage: string) {
       localStorage.setItem('page', newPage);
-      this.usuario = Auth.usuario;
+      this.usuario = AuthService.usuario;
     },
     hideBackButton(newValue: boolean) {
       localStorage.setItem('hide_back_button', newValue ? 's' : 'n');
@@ -223,27 +208,47 @@ export default defineComponent({
   font-size: 10pt;
 }
 
-.mk h1, .mk h2, .mk h3, .mk h4, .mk h5, .mk h6 {
+.mk h1,
+.mk h2,
+.mk h3,
+.mk h4,
+.mk h5,
+.mk h6 {
   padding: 0 0 2px 5px;
-  margin: 4px 0 4px 0;  
+  margin: 4px 0 4px 0;
   border-bottom: 1px solid var(--input-border-color);
 }
 
-.mk h1 { font-size: 14pt;}
-.mk h2 { font-size: 12pt;}
-.mk h3 { 
-  font-size: 13pt; 
-  color: var(--evento-color); 
+.mk h1 {
+  font-size: 14pt;
+}
+
+.mk h2 {
+  font-size: 12pt;
+}
+
+.mk h3 {
+  font-size: 13pt;
+  color: var(--evento-color);
   background-color: var(--evento-background-color);
-  border: 1px solid var(--evento-border-color); 
+  border: 1px solid var(--evento-border-color);
   border-radius: 5px;
   text-align: center;
   padding: 5px;
   margin: 10px 5px 5px 10px;
 }
-.mk h4 { font-size: 11pt;}
-.mk h5 { font-size: 11pt;}
-.mk h6 { font-size: 11pt;}
+
+.mk h4 {
+  font-size: 11pt;
+}
+
+.mk h5 {
+  font-size: 11pt;
+}
+
+.mk h6 {
+  font-size: 11pt;
+}
 
 .mk blockquote {
   padding: 5px;
@@ -253,8 +258,8 @@ export default defineComponent({
 .mk blockquote p {
   margin: 0 0 0 0;
   padding: 5px;
-  background-color: var( --blockquote-background-color);
-  border-left: 3px solid  var( --blockquote-border-color);
+  background-color: var(--blockquote-background-color);
+  border-left: 3px solid var(--blockquote-border-color);
   border-radius: 2px;
   font-size: 11pt;
 }
@@ -292,10 +297,10 @@ main {
   overflow-y: auto;
 }
 
-@media only screen and (hover: none) and (pointer: coarse){
-    section.main_section {
-      margin-bottom: 70px;
-    }
+@media only screen and (hover: none) and (pointer: coarse) {
+  section.main_section {
+    margin-bottom: 70px;
+  }
 }
 
 footer {
@@ -515,7 +520,4 @@ tbody tr td select {
   }
 }
 
-/* print */
-
-
-</style>
+/* print */</style>
