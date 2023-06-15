@@ -2,7 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
     publicPath: process.env.NODE_ENV === 'production'
-        ? '/web'
+        ? '/v2'
         : '/',
     outputDir: 'docs',
     configureWebpack: {
