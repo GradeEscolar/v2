@@ -55,4 +55,31 @@ export default class AulaRepository extends RepositoryBase<Aula> {
         
     }
 
+    excluirPorDisciplina(transaction: IDBTransaction, id_disciplina: number): Promise<void> {
+        return new Promise<void>((ok, err) => {
+            const objectStore = transaction.objectStore(AppConfig.aulaTable);
+            const index = objectStore.index('disciplina');
+            const request = index.openCursor(IDBKeyRange.only(id_disciplina));
+            request.onsuccess = function() {
+                const cursor = this.result;
+                if(cursor){
+                    const requestDelete = cursor.delete();
+                    requestDelete.onsuccess = function() {
+                        cursor.continue();
+                    };
+                    requestDelete.onerror = function() {
+                        console.error('AulaRepository.excluirPorDisciplina.requestDelete', this.error);
+                        err(this.error?.message);
+                    };
+                } else {
+                    ok();
+                }
+            }
+            request.onerror = function () {
+                console.error('AulaRepository.excluirPorDisciplina', this.error);
+                err(this.error?.message);
+            }
+        });
+    }
+
 }

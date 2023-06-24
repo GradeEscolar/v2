@@ -12,7 +12,7 @@ export default class AnotacaoRepository extends RepositoryBase<Anotacao> {
         return new Promise<Anotacao[]>((ok, err) => {
             const transaction = this.db.transaction(this.table, "readonly");
             const objectStore = transaction.objectStore(this.table);
-            const index = objectStore.index(filtro.modo!);
+            const index = objectStore.index(filtro.modo == 'grade' ? 'aula_disciplina_data' : 'disciplina_data');
             const request = filtro.modo == 'grade'
                 ? index.openCursor(IDBKeyRange.only([filtro.aula, filtro.id_disciplina, filtro.data]))
                 : index.openCursor(IDBKeyRange.bound([filtro.id_disciplina, filtro.data.substring(0, 7)], [filtro.id_disciplina, filtro.data.substring(0, 7) + '\uffff']));
@@ -76,6 +76,33 @@ export default class AnotacaoRepository extends RepositoryBase<Anotacao> {
 
     private parseAnotacao(anotacao: Anotacao, removerId: boolean) {
         return JSON.parse(JSON.stringify(anotacao, (key, value) => (removerId && key == 'id') || key == 'modo' ? undefined : value));
+    }
+
+    excluirPorDisciplina(transaction: IDBTransaction, id_disciplina: number): Promise<void> {
+        return new Promise<void>((ok, err) => {
+            const objectStore = transaction.objectStore(AppConfig.anotacaoTable);
+            const index = objectStore.index('disciplina');
+            const request = index.openCursor(IDBKeyRange.only(id_disciplina));
+            request.onsuccess = function() {
+                const cursor = this.result;
+                if(cursor){
+                    const requestDelete = cursor.delete();
+                    requestDelete.onsuccess = function() {
+                        cursor.continue();
+                    };
+                    requestDelete.onerror = function() {
+                        console.error('AnotacaoRepository.excluirPorDisciplina.requestDelete', this.error);
+                        err(this.error?.message);
+                    };
+                } else {
+                    ok();
+                }
+            }
+            request.onerror = function () {
+                console.error('AnotacaoRepository.excluirPorDisciplina: ', this.error);
+                err(this.error?.message);
+            }
+        });
     }
 
 }

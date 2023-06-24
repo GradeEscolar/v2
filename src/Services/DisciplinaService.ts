@@ -32,8 +32,9 @@ export default class DisciplinaService extends ServiceBase<DisciplinaRepository>
         return this.repository.criar(disciplina);
     }
 
-    obter() {
-        return this.repository.obter(AuthService.usuario.id ?? 0);
+    async obter() {
+        const disciplinas = await this.repository.obter(AuthService.usuario.id ?? 0);
+        return this.sort(disciplinas);
     }
 
     atualizar(disciplina: Disciplina) {

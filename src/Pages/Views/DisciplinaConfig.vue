@@ -111,7 +111,9 @@ export default defineComponent({
         },
         async del() {
             try {
+                console.log('Iniciando Exclusão', this.disciplina.id);
                 await this.service.excluir(this.disciplina);
+                console.log('Exclusão Finalizada:');
                 await this.obter();
             } catch (error: any) {
                 this.result = error.message;
