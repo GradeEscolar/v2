@@ -1,6 +1,7 @@
 import Aula from "@/Models/Aula";
 import ServiceBase from "@/DataAccess/ServiceBase";
 import AulaRepository from "@/Repositories/AulaRepository";
+import Grade from "@/Models/Grade";
 
 export default class AulaService extends ServiceBase<AulaRepository> {
 
@@ -8,11 +9,16 @@ export default class AulaService extends ServiceBase<AulaRepository> {
         return this.baseConfig(() => new AulaRepository());
     }
 
-    obter(id_grade: number, dia: number): Promise<Aula[]> {
+    obter(grade: Grade, dia: number): Promise<Aula[]> {
+        console.log('Index: ', grade.dias.indexOf(dia.toString()));
+        if(grade.dias.indexOf(dia.toString()) == -1){
+            return Promise.resolve(new Array<Aula>());
+        }
+        
         const filtro = new Aula();
-        filtro.id_grade = id_grade;
+        filtro.id_grade = grade.id;
         filtro.dia = dia;
-        return this.repository.obter(filtro);
+        return this.repository.obter(grade.id, dia, grade.aulas);
     }
 
     salvar(aulas: Aula[]): Promise<void> {

@@ -8,17 +8,20 @@ export default class AulaRepository extends RepositoryBase<Aula> {
         super(AppConfig.aulaTable);
     }
 
-    async obter(filtro: Aula): Promise<Aula[]> {
+    async obter(id_grade: number, dia: number, maxAula: number): Promise<Aula[]> {
         const transaction = this.db.transaction(this.table, "readonly");
         const objectStore = transaction.objectStore(this.table);
-        const index = objectStore.index('dia');
-        const request = index.openCursor(IDBKeyRange.only(filtro.dia));
+        const index = objectStore.index('grade_dia');
+        const filter = IDBKeyRange.only([id_grade, dia]);
+        const request = index.openCursor(filter);
         return new Promise((ok, err) => {
             const aulas: Aula[] = [];
             request.onsuccess = function () {
                 const cursor = this.result;
                 if (cursor) {
-                    aulas.push(cursor.value);
+                    const aula = cursor.value as Aula;
+                    if (aula.aula <= maxAula)
+                        aulas.push(cursor.value);
                     cursor.continue();
                 } else {
                     ok(aulas);
@@ -52,34 +55,6 @@ export default class AulaRepository extends RepositoryBase<Aula> {
                 err(this.error?.message);
             }
         });
-        
-    }
 
-    excluirPorDisciplina(transaction: IDBTransaction, id_disciplina: number): Promise<void> {
-        return new Promise<void>((ok, err) => {
-            const objectStore = transaction.objectStore(AppConfig.aulaTable);
-            const index = objectStore.index('disciplina');
-            const request = index.openCursor(IDBKeyRange.only(id_disciplina));
-            request.onsuccess = function() {
-                const cursor = this.result;
-                if(cursor){
-                    const requestDelete = cursor.delete();
-                    requestDelete.onsuccess = function() {
-                        cursor.continue();
-                    };
-                    requestDelete.onerror = function() {
-                        console.error('AulaRepository.excluirPorDisciplina.requestDelete', this.error);
-                        err(this.error?.message);
-                    };
-                } else {
-                    ok();
-                }
-            }
-            request.onerror = function () {
-                console.error('AulaRepository.excluirPorDisciplina', this.error);
-                err(this.error?.message);
-            }
-        });
     }
-
 }

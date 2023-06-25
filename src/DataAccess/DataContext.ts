@@ -46,7 +46,7 @@ export default abstract class DataContext {
             DataContext.createIndex(objectStore, AppConfig.usuarioTable, 'nome', 'nome', { unique: true });
             DataContext.createIndex(objectStore, AppConfig.gradeTable, 'usuario', 'id_usuario', { unique: false });
             DataContext.createIndex(objectStore, AppConfig.disciplinaTable, 'usuario', 'id_usuario', { unique: false });
-            DataContext.createIndex(objectStore, AppConfig.aulaTable, 'dia', 'dia', { unique: false });
+            DataContext.createIndex(objectStore, AppConfig.aulaTable, 'grade_dia', ['id_grade', 'dia'], { unique: false });
             DataContext.createIndex(objectStore, AppConfig.aulaTable, 'disciplina', 'id_disciplina', { unique: false });
             DataContext.createIndex(objectStore, AppConfig.anotacaoTable, 'aula_disciplina_data', ['aula', 'id_disciplina', 'data'], { unique: true });
             DataContext.createIndex(objectStore, AppConfig.anotacaoTable, 'disciplina_data', ['id_disciplina', 'data'], { unique: true });

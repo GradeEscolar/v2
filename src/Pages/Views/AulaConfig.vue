@@ -129,7 +129,7 @@ export default defineComponent({
         },
         async obterDados() {
             this.dia = this.dia ?? Number(this.grade.dias.substring(0, 1));
-            this.aulasDb = await this.aulaService.obter(this.grade.id, this.dia);
+            this.aulasDb = await this.aulaService.obter(this.grade, this.dia);
             this.ler();
         }
     },

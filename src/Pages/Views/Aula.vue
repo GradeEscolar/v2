@@ -111,7 +111,7 @@ export default defineComponent({
             }
         },
         async selecionarAula(fromSession: boolean = false) {
-            let aulas = await this.aulaService.obter(this.grade!.id, this.dia!.dia);
+            let aulas = await this.aulaService.obter(this.grade!, this.dia!.dia);
             if (aulas)
                 aulas = this.aulaService.sort(aulas);
             this.aulas = aulas?.length == 0 ? undefined : aulas;

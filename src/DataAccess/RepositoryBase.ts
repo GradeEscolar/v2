@@ -114,9 +114,37 @@ export default abstract class RepositoryBase<T extends IModel> extends DataConte
         return new Promise((ok, err) => {
             request.onsuccess = function () {
                 ok();
+            };
+            request.onerror = function () {
+                console.error('DisciplinaRepository.delete', model, this.error);
+                err(this.error?.message);
+            };
+        });
+    }
+
+    deleteByIndex(transaction: IDBTransaction, indexName: string, value: any): Promise<void> {
+        return new Promise<void>((ok, err) => {
+            const table = this.table;
+            const objectStore = transaction.objectStore(table);
+            const index = objectStore.index(indexName);
+            const request = index.openCursor(IDBKeyRange.only(value));
+            request.onsuccess = function() {
+                const cursor = this.result;
+                if(cursor){
+                    const requestDelete = cursor.delete();
+                    requestDelete.onsuccess = function() {
+                        cursor.continue();
+                    };
+                    requestDelete.onerror = function() {
+                        console.error(`deleteByIndex.request: ${table}.${indexName}`, this.error);
+                        err(this.error?.message);
+                    };
+                } else {
+                    ok();
+                }
             }
             request.onerror = function () {
-                console.log(this.error);
+                console.error(`deleteByIndex: ${table}.${indexName}`, this.error);
                 err(this.error?.message);
             }
         });
@@ -124,5 +152,9 @@ export default abstract class RepositoryBase<T extends IModel> extends DataConte
 
     protected parseModel(model: any, removerId: boolean) {
         return JSON.parse(JSON.stringify(model, (key, value) => removerId && key == 'id' ? undefined : value));
+    }
+
+    createTransaction(storeNames: string | Iterable<string>): IDBTransaction {
+        return this.db.transaction(storeNames, "readwrite");
     }
 }

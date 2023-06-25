@@ -2,9 +2,20 @@ import Disciplina from "@/Models/Disciplina";
 import ServiceBase from "@/DataAccess/ServiceBase";
 import DisciplinaRepository from "@/Repositories/DisciplinaRepository";
 import AuthService from "@/Services/AuthService";
+import AppConfig from "@/AppConfig";
+import AnotacaoRepository from "@/Repositories/AnotacaoRepository";
+import AulaRepository from "@/Repositories/AulaRepository";
 
 export default class DisciplinaService extends ServiceBase<DisciplinaRepository> {
 
+    private aulaRepository: AulaRepository;
+    private anotacaoRepository: AnotacaoRepository;
+
+    constructor() {
+        super();
+        this.aulaRepository = new AulaRepository();
+        this.anotacaoRepository = new AnotacaoRepository();
+    }
 
     config(): Promise<boolean> {
         return this.baseConfig(() => new DisciplinaRepository());
@@ -42,6 +53,19 @@ export default class DisciplinaService extends ServiceBase<DisciplinaRepository>
     }
 
     excluir(disciplina: Disciplina) {
-        return this.repository.excluir(disciplina);
+        return new Promise<void>(async (ok, err) => {
+            const transaction = this.repository.createTransaction([AppConfig.disciplinaTable, AppConfig.aulaTable, AppConfig.anotacaoTable]);
+            const excluirAnotacao = this.anotacaoRepository.deleteByIndex(transaction, 'disciplina', disciplina.id!);
+            const excluirAula = this.aulaRepository.deleteByIndex(transaction, 'disciplina', disciplina.id!);
+            const excluirDisciplina = this.repository.excluir(transaction, disciplina.id!);
+            await Promise.all([excluirAnotacao, excluirAula, excluirDisciplina]);
+            transaction.oncomplete = function() {
+                ok();
+            }
+            transaction.onerror = function () {
+                console.error('DisciplinaService.excluir:', disciplina, this.error);
+                err(this.error?.message);
+            }
+        })
     }
 }

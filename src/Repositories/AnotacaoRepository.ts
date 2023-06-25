@@ -77,32 +77,4 @@ export default class AnotacaoRepository extends RepositoryBase<Anotacao> {
     private parseAnotacao(anotacao: Anotacao, removerId: boolean) {
         return JSON.parse(JSON.stringify(anotacao, (key, value) => (removerId && key == 'id') || key == 'modo' ? undefined : value));
     }
-
-    excluirPorDisciplina(transaction: IDBTransaction, id_disciplina: number): Promise<void> {
-        return new Promise<void>((ok, err) => {
-            const objectStore = transaction.objectStore(AppConfig.anotacaoTable);
-            const index = objectStore.index('disciplina');
-            const request = index.openCursor(IDBKeyRange.only(id_disciplina));
-            request.onsuccess = function() {
-                const cursor = this.result;
-                if(cursor){
-                    const requestDelete = cursor.delete();
-                    requestDelete.onsuccess = function() {
-                        cursor.continue();
-                    };
-                    requestDelete.onerror = function() {
-                        console.error('AnotacaoRepository.excluirPorDisciplina.requestDelete', this.error);
-                        err(this.error?.message);
-                    };
-                } else {
-                    ok();
-                }
-            }
-            request.onerror = function () {
-                console.error('AnotacaoRepository.excluirPorDisciplina: ', this.error);
-                err(this.error?.message);
-            }
-        });
-    }
-
 }
