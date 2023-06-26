@@ -10,7 +10,6 @@ export default class AulaService extends ServiceBase<AulaRepository> {
     }
 
     obter(grade: Grade, dia: number): Promise<Aula[]> {
-        console.log('Index: ', grade.dias.indexOf(dia.toString()));
         if(grade.dias.indexOf(dia.toString()) == -1){
             return Promise.resolve(new Array<Aula>());
         }
