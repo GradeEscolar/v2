@@ -57,4 +57,8 @@ export default class AulaRepository extends RepositoryBase<Aula> {
         });
 
     }
+
+    excluirPorDisciplina(id_disciplina: number, transaction?: IDBTransaction) {
+        return this.deleteByIndex('disciplina', id_disciplina, transaction);
+    }
 }

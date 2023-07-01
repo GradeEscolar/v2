@@ -12,25 +12,15 @@ export default class DisciplinaRepository extends RepositoryBase<Disciplina> {
         return this.add(disciplina);
     }
 
-    obter(id_usuario: number): Promise<Disciplina[]> {
-        return this.findOnly('usuario', id_usuario);
+    obter(id_usuario: number, transaction?:IDBTransaction): Promise<Disciplina[]> {
+        return this.findOnly('usuario', id_usuario, transaction);
     }
 
     atualizar(disciplina: Disciplina): Promise<void> {
         return this.put(disciplina);
     }
 
-    excluir(transaction: IDBTransaction, id_disciplina: number): Promise<void> {
-        return new Promise<void>((ok, err) => {
-            const objectStore = transaction.objectStore(AppConfig.disciplinaTable);
-            const request = objectStore.delete(id_disciplina);
-            request.onsuccess = function () {
-                ok();
-            }
-            request.onerror = function () {
-                console.error(`DisciplinaRepository.excluir: ${id_disciplina}`, this.error);
-                err(this.error?.message);
-            }
-        });
+    excluir(id_disciplina: number, transaction?: IDBTransaction): Promise<void> {
+        return this.excluir(id_disciplina, transaction);
     }
 }

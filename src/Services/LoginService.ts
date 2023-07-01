@@ -1,11 +1,11 @@
-import LoginRepository from "@/Repositories/LoginRepository";
+import UsuarioRepository from "@/Repositories/UsuarioRepository";
 import ServiceBase from "@/DataAccess/ServiceBase";
 import Usuario from "@/Models/Usuario";
 
-export default class LoginService extends ServiceBase<LoginRepository> {
+export default class LoginService extends ServiceBase<UsuarioRepository> {
     
     config(): Promise<boolean> {
-        return this.baseConfig(() => new LoginRepository());
+        return this.baseConfig(() => new UsuarioRepository());
     }
 
     async existeUsuario(): Promise<boolean> {

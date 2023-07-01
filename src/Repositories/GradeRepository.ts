@@ -17,4 +17,12 @@ export default class GradeRepository extends RepositoryBase<Grade> {
         return this.put(grade);
     }
 
+    async importarGrade(grade: Grade, transaction: IDBTransaction): Promise<Grade> {
+        const gradesDb = await this.findOnly('usuario', AuthService.usuario.id ?? 0, transaction);
+        const gradeDb = gradesDb[0];
+        gradeDb.aulas = grade.aulas;
+        gradeDb.dias = grade.dias;
+        await this.put(grade, transaction);
+        return gradeDb;
+    }
 }

@@ -3,7 +3,7 @@ import RepositoryBase from "@/DataAccess/RepositoryBase";
 import Grade from "@/Models/Grade";
 import Usuario from "@/Models/Usuario";
 
-export default class LoginRepository extends RepositoryBase<Usuario> {
+export default class UsuarioRepository extends RepositoryBase<Usuario> {
     
     constructor() {
         super(AppConfig.usuarioTable);

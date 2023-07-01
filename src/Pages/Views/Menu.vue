@@ -45,7 +45,16 @@
                             Aulas
                         </span>
                     </div>
+                </span>
+            </span>
 
+            <span class="lnk" @click="goToPage('Backup')">
+                <i class="pi pi-save"></i>
+                <span>
+                    <h1>Cópia de segurança</h1>
+                    <p>
+                        Crie ou restaure um backup.<br /> 
+                    </p>
                 </span>
             </span>
 

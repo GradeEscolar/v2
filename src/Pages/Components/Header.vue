@@ -139,6 +139,13 @@ export default defineComponent({
                 this.title = 'Aulas';
                 this.login = false;
                 this.sair = false;
+            } else if (page == 'Backup') {
+                this.back = true;
+                this.backTo = 'Menu';
+                this.icon = 'pi pi-save';
+                this.title = 'Cópia de segurança';
+                this.login = false;
+                this.sair = false;
             }
         }
     },

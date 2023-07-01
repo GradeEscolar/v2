@@ -74,6 +74,10 @@ export default class AnotacaoRepository extends RepositoryBase<Anotacao> {
         });
     }
 
+    excluirPorDisciplina(id_disciplina: number, transaction?: IDBTransaction) {
+        return this.deleteByIndex('disciplina', id_disciplina, transaction);
+    }
+
     private parseAnotacao(anotacao: Anotacao, removerId: boolean) {
         return JSON.parse(JSON.stringify(anotacao, (key, value) => (removerId && key == 'id') || key == 'modo' ? undefined : value));
     }

@@ -43,6 +43,10 @@
         <AulaConfigView @go-to-page="goToPage" />
       </div>
 
+      <div v-if="page == 'Backup'">
+        <BackupView @go-to-page="goToPage" />
+      </div>
+
     </section>
 
   </main>
@@ -71,6 +75,7 @@ import AnotacoesView from './Pages/Views/Anotacoes.vue';
 import DisciplinaConfigView from './Pages/Views/DisciplinaConfig.vue';
 import GradeConfigView from './Pages/Views/GradeConfig.vue';
 import AulaConfigView from './Pages/Views/AulaConfig.vue';
+import BackupView from './Pages/Views/Backup.vue';
 import Usuario from './Models/Usuario';
 import AuthService from './Services/AuthService';
 
@@ -87,7 +92,8 @@ export default defineComponent({
     AnotacoesView,
     DisciplinaConfigView,
     GradeConfigView,
-    AulaConfigView
+    AulaConfigView,
+    BackupView
   },
 
   data(): {
