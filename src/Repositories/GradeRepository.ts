@@ -22,7 +22,7 @@ export default class GradeRepository extends RepositoryBase<Grade> {
         const gradeDb = gradesDb[0];
         gradeDb.aulas = grade.aulas;
         gradeDb.dias = grade.dias;
-        await this.put(grade, transaction);
+        await this.put(gradeDb, transaction);
         return gradeDb;
     }
 }

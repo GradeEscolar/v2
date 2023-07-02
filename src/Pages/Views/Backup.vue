@@ -2,7 +2,7 @@
     <section class="form">
         <form>
             <p style="text-align: left;">
-                Seus dados serão exportados em um arquivo de texto no formato JSon.<br />
+                Seus dados serão exportados em um arquivo no formato ge_bkp.<br />
                 Realize este backup caso precise remover os cookies
                 e dados do site ou trocar de dispositivo.
             </p>
@@ -12,15 +12,12 @@
             </div>
             <hr />
             <p style="text-align: left;">
-                Selecione um arquivo de backup e inicie a importação.<br />
+                Selecione um arquivo de backup (ge_bkp) e inicie a importação.<br />
                 Obs.: Os dados atuais serão substituídos pelo conteúdo do arquivo!
             </p>
-            <div class="field">
-                <input type="file" accept=".*" @change="selectFile" />
-            </div>
             <div class="button">
-                <button type="button" :disabled="inputFile == undefined" @click="importar()">Importar</button>
-                <mark></mark>
+                <button type="button" @click="importar()">Importar</button>
+                <mark v-if="importResult">{{ importResult }}</mark>
             </div>
         </form>
     </section>
@@ -29,7 +26,9 @@
         mensagem="Os dados atuais serão substituídos pelo conteúdo do arquivo!<br />Você confirma esta importação?"
         icone="pi pi-trash" yes no @msgbox-result="msgboxResult" />
 
-    <a id="download" ref="download"></a>
+    <a id="download" ref="download" style="display: none;"></a>
+
+    <input id="inputFile" ref="inputFile" type="file" accept=".ge_bkp" @change="selectFile" style="display: none;" />
 </template>
 
 <script lang="ts">
@@ -50,14 +49,14 @@ export default defineComponent({
         exportResult: string | undefined,
         importResult: string | undefined,
         exibirImportar: boolean,
-        inputFile: File | undefined
+        importFile: File | undefined
     } {
         return {
             service: new BackupService(),
             exportResult: undefined,
             importResult: undefined,
             exibirImportar: false,
-            inputFile: undefined
+            importFile: undefined
         }
     },
 
@@ -89,11 +88,11 @@ export default defineComponent({
             if (!result)
                 return;
 
-            if (this.inputFile == undefined)
+            if (this.importFile == undefined)
                 return;
 
             try {
-                await this.service.importar(this.inputFile);
+                await this.service.importar(this.importFile);
                 this.importResult = "Importação concluída."
             } catch (error) {
                 this.importResult = "O arquivo informado não é válido!";
@@ -102,15 +101,21 @@ export default defineComponent({
 
         importar() {
             this.importResult = undefined;
-            this.exibirImportar = true;
+            this.exportResult = undefined;
+            const inputFile = this.$refs.inputFile as HTMLInputElement;
+            inputFile.value = '';
+            inputFile.files = null;
+            inputFile.click();
         },
 
         selectFile(event: Event) {
-            this.inputFile = undefined;
-            this.importResult = undefined;
-            const fileInput = event.target as HTMLInputElement;
-            if (fileInput.files)
-                this.inputFile = fileInput.files[0];
+            this.importFile = undefined;
+            const inputFile = event.target as HTMLInputElement;
+            if (inputFile.files)
+            {
+                this.importFile = inputFile.files[0];
+                this.exibirImportar = true;
+            }
         }
     },
 
@@ -130,9 +135,5 @@ p {
 
 hr {
     margin: 30px 0 30px 0;
-}
-
-#download {
-    visibility: hidden;
 }
 </style>

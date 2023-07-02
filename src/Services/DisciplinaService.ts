@@ -55,9 +55,9 @@ export default class DisciplinaService extends ServiceBase<DisciplinaRepository>
     excluir(disciplina: Disciplina) {
         return new Promise<void>(async (ok, err) => {
             const transaction = this.repository.createTransaction([AppConfig.disciplinaTable, AppConfig.aulaTable, AppConfig.anotacaoTable]);
-            const excluirAnotacao = this.anotacaoRepository.deleteByIndex(transaction, 'disciplina', disciplina.id!);
-            const excluirAula = this.aulaRepository.deleteByIndex(transaction, 'disciplina', disciplina.id!);
-            const excluirDisciplina = this.repository.excluir(transaction, disciplina.id!);
+            const excluirAnotacao = this.anotacaoRepository.deleteByIndex('disciplina', disciplina.id!, transaction);
+            const excluirAula = this.aulaRepository.deleteByIndex('disciplina', disciplina.id!, transaction);
+            const excluirDisciplina = this.repository.delete(disciplina, transaction);
             await Promise.all([excluirAnotacao, excluirAula, excluirDisciplina]);
             transaction.oncomplete = function() {
                 ok();

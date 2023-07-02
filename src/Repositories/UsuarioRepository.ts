@@ -30,7 +30,6 @@ export default class UsuarioRepository extends RepositoryBase<Usuario> {
                 grade.id_usuario = usuario.id;
                 grade.dias = '2;3;4;5;6';
                 grade.aulas = 5;
-                console.log(grade);
                 const requestGrade = osGrade.add(this.parseModel(grade, true));
                 requestGrade.onsuccess = function() {
                     ok(usuario);

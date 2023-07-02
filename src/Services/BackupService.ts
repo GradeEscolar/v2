@@ -77,6 +77,7 @@ export default class BackupService extends ServiceBase<UsuarioRepository> {
         backup.usuario = AuthService.usuario;
         if (!backup.grade) return;
 
+        backup.grade.id_usuario = backup.usuario.id!;
         backup.grade = await this.gradeRepository.importarGrade(backup.grade, transaction);
 
         await this.excluirDadosAtuais(transaction);
@@ -119,7 +120,7 @@ export default class BackupService extends ServiceBase<UsuarioRepository> {
         disciplinas.forEach(async d => {
             const excluirAnotacao = this.anotacaoRepository.excluirPorDisciplina(d.id!, transaction);
             const excluirAula = this.aulaRepository.excluirPorDisciplina(d.id!, transaction);
-            const excluirDisciplina = this.disciplinaRepository.excluir(d.id!, transaction);
+            const excluirDisciplina = this.disciplinaRepository.delete(d, transaction);
             await Promise.all([excluirAnotacao, excluirAula, excluirDisciplina]);
         });
     }

@@ -19,8 +19,4 @@ export default class DisciplinaRepository extends RepositoryBase<Disciplina> {
     atualizar(disciplina: Disciplina): Promise<void> {
         return this.put(disciplina);
     }
-
-    excluir(id_disciplina: number, transaction?: IDBTransaction): Promise<void> {
-        return this.excluir(id_disciplina, transaction);
-    }
 }
