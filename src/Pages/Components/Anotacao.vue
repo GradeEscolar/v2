@@ -10,13 +10,30 @@
                     <span>
                         <p>
                             <span>{{ anotacao.aula }}ª aula - </span>
-                            <span class="disciplina">{{ disciplina }}</span>
+                            <span class="disciplina">{{ disciplina?.disciplina }}</span>
                         </p>
                     </span>
 
                     <span class="lnk" @click="definirEdit(true)" v-if="!edit">
                         <p class="no-print">Editar</p>
                     </span>
+
+                    <span v-if="!edit && origem == 'aula'" class="no-print">|</span>
+                    <span class="lnk" @click="anotacoes" v-if="!edit && origem == 'aula'">
+                        <p class="no-print">
+                            <i class="pi pi-book"></i>
+                            Anotações
+                        </p>
+                    </span>
+
+                    <span v-if="!edit && origem == 'anotacao'" class="no-print">|</span>
+                    <span class="lnk" @click="aula" v-if="!edit && origem == 'anotacao'">
+                        <p class="no-print">
+                            <i class="pi pi-file-edit"></i>
+                            Aula
+                        </p>
+                    </span>
+
 
                     <span class="lnk" @click="alternarPreview()" v-if="edit">
                         <p class="no-print">{{ preview ? 'Editar' : 'Visualizar' }}</p>
@@ -56,6 +73,41 @@
                     <p>--- Linha divisória</p>
                     <hr />
                     <br />
+
+                    <h4>Tabelas</h4>
+                    <p><b>Estrutura:</b></p>
+                    <p style="margin-left: 10px; margin-bottom: 5px;">
+                        Titulo das colunas<br />
+                        Alinhamento das colunas (esquerda, centralizado e direita)<br />
+                        Conteúdo da tabela
+                    </p>
+                    <p><b>Exemplo:</b></p>
+                    <p style="margin-left: 10px; margin-bottom: 5px;">
+                        Coluna 1 | Coluna 2 | Coluna 3<br />
+                        :--- | :---: | ---:<br />
+                        Valor 1 | Valor 2 | Valor 3
+                    </p>
+                    <p><b>Resultado:</b></p>
+                    <table style="margin-left: 10px; margin-bottom: 5px;">
+                        <caption></caption>
+                        <header>
+                            <tr>
+                                <th style="text-align: left;">Coluna 1</th>
+                                <th style="text-align: center;">Coluna 2</th>
+                                <th style="text-align: right;">Coluna 3</th>
+                            </tr>
+                        </header>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: left;">Valor 1</td>
+                                <td style="text-align: center;">Valor 2</td>
+                                <td style="text-align: right;">Valor 3</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <br />
+
                     <br />
                     <br />
                     <br />
@@ -76,6 +128,7 @@ import Dia from '@/Models/Dia';
 import Anotacao from '@/Models/Anotacao';
 import MarkdownIt from 'markdown-it';
 import AnotacaoService from '@/Services/AnotacaoService';
+import Disciplina from '@/Models/Disciplina';
 
 
 export default defineComponent({
@@ -83,8 +136,9 @@ export default defineComponent({
 
     props: {
         anotacao: Anotacao,
-        disciplina: String,
-        exibirTitulos: Boolean
+        disciplina: Disciplina,
+        exibirTitulos: Boolean,
+        origem: String
     },
 
     data(): {
@@ -113,7 +167,7 @@ export default defineComponent({
         }
     },
 
-    emits: ['editando'],
+    emits: ['editando', 'goToPage'],
 
     methods: {
         definirDataCompleta(anotacao: Anotacao | undefined) {
@@ -153,6 +207,28 @@ export default defineComponent({
             let anotacao_db = await this.service.salvarAnotacao(this.anotacao!);
             this.anotacao!.id = anotacao_db.id;
             this.definirEdit(false);
+        },
+        anotacoes() {
+            if (this.disciplina)
+                sessionStorage.setItem('anotacoes_disciplina', this.disciplina.id!.toString());
+
+            if (this.anotacao?.data) {
+                const data = new Date(this.anotacao.data).toISOString().substring(0, 10);
+                const dt = new Date(`${data}T00:00:00.000-03:00`);
+                const mes = Dia.obterMes(dt);
+                sessionStorage.setItem('anotacoes_mes', mes);
+            }
+            
+            this.$emit('goToPage', 'Anotacoes');
+        },
+        aula() {
+            if(this.anotacao){
+                const data = new Date(this.anotacao.data).toISOString().substring(0, 10);
+                sessionStorage.setItem('aula_data', data);
+                sessionStorage.setItem('aula_aula', this.anotacao.aula.toString());
+            }
+
+            this.$emit('goToPage', 'Aula');
         }
     },
 
@@ -289,4 +365,5 @@ span.help {
     .no-print {
         display: none;
     }
-}</style>
+}
+</style>

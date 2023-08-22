@@ -57,6 +57,10 @@ export default class Dia {
         return data.toISOString().substring(0, 7);
     }
 
+    static obterMes(data: Date): string {
+        return data.toISOString().substring(0, 7);
+    }
+
     static dataCompleta(data: Date): string {
         return `${this.dias().find(d => d.dia == data.getDay() + 1)!.nome}, ${data.getDate()} de ${this.meses()[data.getMonth()]} de ${data.getFullYear()}`;
     }

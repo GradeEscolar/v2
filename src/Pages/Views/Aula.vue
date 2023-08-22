@@ -21,7 +21,7 @@
                     <tr class="hover" v-for="aula in aulas" @click="setAula(aula)"
                         :class="{ selecionada: aulaAtiva(aula.aula) }">
                         <td class="center">{{ aula.aula }}</td>
-                        <td>{{ obterDisciplina(aula.id_disciplina) }}</td>
+                        <td>{{ obterDisciplina(aula.id_disciplina)?.disciplina }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -32,8 +32,8 @@
 
         </section>
 
-        <AnotacaoComponent @editando="editando" :anotacao="anotacao" :disciplina="obterDisciplina(aula?.id_disciplina)"
-            exibir-titulos>
+        <AnotacaoComponent @editando="editando" @go-to-page="goToPage" :anotacao="anotacao" :disciplina="obterDisciplina(aula?.id_disciplina)"
+             exibir-titulos origem="aula">
         </AnotacaoComponent>
     </span>
 </template>
@@ -138,8 +138,8 @@ export default defineComponent({
             this.aula = aula;
             this.anotacao = await this.anotacaoService.obterAnotacao(this.aula, this.data!);
         },
-        obterDisciplina(id_disciplina: number | undefined): string | undefined {
-            return this.disciplinas?.find(d => d.id == id_disciplina)?.disciplina;
+        obterDisciplina(id_disciplina: number | undefined): Disciplina | undefined {
+            return this.disciplinas?.find(d => d.id == id_disciplina);
         },
         async salvarAnotacao() {
             await this.anotacaoService.salvarAnotacao(this.anotacao!);

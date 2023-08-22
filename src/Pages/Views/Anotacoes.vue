@@ -31,7 +31,8 @@
     </section>
 
     <span v-for="anotacao in anotacoes">
-        <AnotacaoComponent :anotacao="anotacao" :disciplina="disciplina?.disciplina" :exibir-titulos="exibirTitulos">
+        <AnotacaoComponent :anotacao="anotacao" :disciplina="disciplina" :exibir-titulos="exibirTitulos" origem="anotacao"
+            @go-to-page="goToPage">
         </AnotacaoComponent>
     </span>
 </template>
@@ -89,7 +90,9 @@ export default defineComponent({
         async obterDisciplinas() {
             this.disciplinas = await this.disciplinaService.obter();
             if (this.disciplinas) {
-                this.disciplina = this.disciplinas[0];
+                const id = sessionStorage.getItem('anotacoes_disciplina');
+                const disciplina = this.disciplinas.find(d => d.id == parseInt(id ?? '0'));
+                this.disciplina = disciplina ?? this.disciplinas[0];
             }
         },
         async obterAnotacoes() {
@@ -122,7 +125,7 @@ export default defineComponent({
             this.exibirTitulos = exibirTitulos == 's';
         }
 
-        this.mes = Dia.mesAtual();
+        this.mes = sessionStorage.getItem('anotacoes_mes') ?? Dia.mesAtual();
         await this.obterDisciplinas();
         await this.obterAnotacoes();
     },
@@ -130,6 +133,14 @@ export default defineComponent({
     watch: {
         exibirTitulos(newData: boolean) {
             localStorage.setItem('exibir_titulos', newData ? 's' : 'n');
+        },
+
+        mes(newData: string) {
+            sessionStorage.setItem('anotacoes_mes', newData);
+        },
+
+        disciplina(newData: Disciplina) {
+            sessionStorage.setItem('anotacoes_disciplina', newData.id?.toString() ?? '');
         }
     }
 });
